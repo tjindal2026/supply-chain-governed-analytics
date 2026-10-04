@@ -41,12 +41,26 @@ PERSONAS = {
 
 session = get_active_session()
 
+ALLOWED_EMAILS = {
+    "evaluator@hack2skill.com",
+    "hack2skillevaluator@gmail.com",
+    "tjindal2026@gmail.com",
+    "tarunjindal@jindaltechnik.com",
+}
+
+
+def check_user_access():
+    email = (st.user.email or "").lower().strip()
+    user_name = st.user.user_name or email
+    return user_name, email
+
 
 def call_agent(messages):
     payload = json.dumps({"messages": messages})
-    escaped = payload.replace("'", "''")
-    sql = f"SELECT TRY_PARSE_JSON(SNOWFLAKE.CORTEX.DATA_AGENT_RUN('{AGENT_FQN}', '{escaped}')) AS resp"
-    result = session.sql(sql).collect()
+    result = session.sql(
+        "SELECT TRY_PARSE_JSON(SNOWFLAKE.CORTEX.DATA_AGENT_RUN(?, ?)) AS resp",
+        params=[AGENT_FQN, payload],
+    ).collect()
     raw = result[0]["RESP"]
     if isinstance(raw, str):
         return json.loads(raw)
@@ -72,7 +86,16 @@ def extract_text_and_sql(response):
 
 # ── UI ──────────────────────────────────────────────────────
 st.set_page_config(page_title="Supply Chain Agent", page_icon="📦", layout="wide")
+
+username, email = check_user_access()
+
+if email not in ALLOWED_EMAILS:
+    st.error("Access denied. Your email is not authorized to use this application.")
+    st.info(f"Logged in as: **{username}** (email: {email})")
+    st.stop()
+
 st.title("📦 Supply Chain Analytics Agent")
+st.sidebar.success(f"Logged in: **{email}**")
 
 with st.sidebar:
     st.header("Persona")
