@@ -1,0 +1,7 @@
+[project]
+name = "supply-chain-chat"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "snowflake-connector-python>=3.3.0",
+]

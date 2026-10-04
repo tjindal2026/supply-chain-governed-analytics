@@ -46,4 +46,7 @@ CREATE OR REPLACE AGENT SUPPLY_CHAIN.CORE.SUPPLY_CHAIN_AGENT
   tool_resources:
     supply_chain_analyst:
       semantic_view: "SUPPLY_CHAIN.CORE.SUPPLY_CHAIN_ANALYTICS"
+      execution_environment:
+        type: warehouse
+        warehouse: "COMPUTE_WH"
   $$;
